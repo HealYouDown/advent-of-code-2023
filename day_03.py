@@ -93,5 +93,5 @@ if __name__ == "__main__":
             else:
                 symbols.append(Symbol(symbol=value, pos=Pos(x=match.start(), y=row)))
 
-    # print(puzzle_1(part_numbers, symbols))
+    print(puzzle_1(part_numbers, symbols))
     print(puzzle_2(part_numbers, symbols))

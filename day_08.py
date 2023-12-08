@@ -2,6 +2,8 @@ from utils import get_input
 from typing import Literal, Union
 import re
 from dataclasses import dataclass
+from collections import defaultdict
+import math
 
 INSTRUCTIONS = tuple[Literal["L"] | Literal["R"]]
 
@@ -31,22 +33,24 @@ def puzzle_1(start_node: Node, instructions: INSTRUCTIONS) -> int:
 
 
 def puzzle_2(start_nodes: list[Node], instructions: INSTRUCTIONS) -> int:
-    # FIXME: runs too long x)
-    # Assumption:
-    # Nodes probably start running in a circle after x instructions, so we could
-    # calculate that point and do some fancy math to find the required steps so that they
-    # all align at a Z node.
     steps = 0
     i = 0
-    current_nodes = start_nodes
-    while not all(node.name.endswith("Z") for node in current_nodes):
+    current_nodes = start_nodes[:]
+    start_nodes_to_end_node_steps: dict[str, int | None] = defaultdict(None)
+    while not len(start_nodes_to_end_node_steps) == len(start_nodes):
         instr = instructions[i % len(instructions)]
         for idx, node in enumerate(current_nodes):
-            current_nodes[idx] = node.left if instr == "L" else node.right
+            if start_nodes[idx].name in start_nodes_to_end_node_steps:
+                continue
+            new_code = node.left if instr == "L" else node.right
+            current_nodes[idx] = new_code
+            if new_code.name.endswith("Z"):
+                start_nodes_to_end_node_steps[start_nodes[idx].name] = steps + 1
+
         steps += 1
         i += 1
 
-    return steps
+    return math.lcm(*list(start_nodes_to_end_node_steps.values()))
 
 
 if __name__ == "__main__":
